@@ -1,7 +1,11 @@
-import { SET_NAME, SET_PRICE } from "./types.js";
+import { SET_NAME, SET_PRICE, SET_ERROR, CLEAR } from "./types.js";
 import axios from "axios";
 
 const APIurl = "https://api.coinpaprika.com/v1";
+
+export const clearLastConversion = () => dispatch => {
+  dispatch({ type: CLEAR });
+};
 
 export const getNames = symbols => dispatch => {
   symbols.forEach(symbol => {
@@ -19,10 +23,13 @@ export const getNames = symbols => dispatch => {
         });
       })
       .catch(function(error) {
-        //TODO handle error when fetching name
-        console.log({ error: error.response.data.error });
+        dispatch({ type: SET_ERROR, payload: error.message });
       });
   });
+};
+
+const roundTo2 = num => {
+  return Math.round((num + Number.EPSILON) * 100) / 100;
 };
 
 export const getPrices = priceSymbols => dispatch => {
@@ -35,15 +42,21 @@ export const getPrices = priceSymbols => dispatch => {
       }
     })
       .then(function(response) {
-        console.log(response);
-        // dispatch({
-        //   type: SET_PRICE,
-        //   payload: { priceSymbol, price: response.data.currencies[0].name }
-        // });
+        const currId = response.data.currencies[0].id;
+
+        axios(`${APIurl}/coins/${currId}/ohlcv/latest/`)
+          .then(function(response) {
+            dispatch({
+              type: SET_PRICE,
+              payload: { priceSymbol, price: roundTo2(response.data[0].close) }
+            });
+          })
+          .catch(function(error) {
+            dispatch({ type: SET_ERROR, payload: error.message });
+          });
       })
       .catch(function(error) {
-        //TODO handle error when fetching name
-        console.log({ error: error.response.data.error });
+        dispatch({ type: SET_ERROR, payload: error.message });
       });
   });
 };
