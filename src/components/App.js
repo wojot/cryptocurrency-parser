@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import "../css/main.scss";
 import { getNames, getPrices, clearLastConversion } from "../actions";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 
@@ -10,7 +9,7 @@ function App({
   clearLastConversion,
   names,
   prices,
-  error
+  error,
 }) {
   const [input, setInput] = useState(
     "Example {{ Name/BTC }} ({{ Price/BTC }}) test In 1998, Wei Dai published a description of b-money, characterized as an anonymous, distributed electronic cash system.Shortly thereafter, Nick Szabo described bit gold. Like {{ Name/BTC }} and other cryptocurrencies that would follow it, bit gold (not to be confused with the later gold-based exchange, {{ Name/BITGOLD }}) was described as an electronic currency system which required users to complete a proof of work function with solutions being cryptographically put together and published. A currency system based on a reusable proof of work was later created by Hal Finney who followed the work of Dai and Szabo. The first decentralized cryptocurrency, {{ Name/BTC }} ({{ Price/BTC }}), was created in 2009 by pseudonymous developer Satoshi Nakamoto. It used SHA-256, a cryptographic hash function, as its proof-of-work scheme. In April 2011, {{ Name/NMC }}  ({{ Price/NMC }}) was created as an attempt at forming a decentralized DNS, which would make internet censorship very difficult. Soon after, in October 2011, {{ Name/LTC }}  ({{ Price/LTC }}) was released. It was the first successful cryptocurrency to use scrypt as its hash function instead of SHA-256. Another notable cryptocurrency, {{ Name/PPC }}  ({{ Price/PPC }}) was the first to use a proof-of-work/proof-of-stake hybrid."
@@ -24,7 +23,7 @@ function App({
       let outputText = "";
       let fullInputTable = [];
 
-      input.split("{{ ").forEach(slice => {
+      input.split("{{ ").forEach((slice) => {
         fullInputTable = fullInputTable.concat(slice.split(" }}"));
       });
 
@@ -32,7 +31,7 @@ function App({
         if (isOdd(index)) {
           if (splitForType(slice) === "Name") {
             let currSymbol = splitForCurrency(slice);
-            let currName = names.find(curr => curr.symbol === currSymbol);
+            let currName = names.find((curr) => curr.symbol === currSymbol);
             if (currName) {
               slice = currName.name;
             }
@@ -41,7 +40,7 @@ function App({
           if (splitForType(slice) === "Price") {
             let currPriceSymbol = splitForCurrency(slice);
             let currPrice = prices.find(
-              curr => curr.priceSymbol === currPriceSymbol
+              (curr) => curr.priceSymbol === currPriceSymbol
             );
             if (currPrice) {
               slice = `$${currPrice.price}`;
@@ -54,19 +53,19 @@ function App({
     }
   });
 
-  const handleInput = event => {
+  const handleInput = (event) => {
     setInput(event.target.value);
   };
 
-  const isOdd = num => {
+  const isOdd = (num) => {
     return num % 2;
   };
 
-  const splitForType = source => {
+  const splitForType = (source) => {
     return source.split("/")[0];
   };
 
-  const splitForCurrency = source => {
+  const splitForCurrency = (source) => {
     return source.split("/")[1];
   };
 
@@ -77,7 +76,7 @@ function App({
 
     let fullInputTable = [];
 
-    input.split("{{ ").forEach(slice => {
+    input.split("{{ ").forEach((slice) => {
       fullInputTable = fullInputTable.concat(slice.split(" }}"));
     });
 
@@ -115,7 +114,7 @@ function App({
               <Form.Control
                 as="textarea"
                 rows="30"
-                onChange={event => handleInput(event)}
+                onChange={(event) => handleInput(event)}
                 value={input}
               />
             </Form.Group>
@@ -143,15 +142,15 @@ function App({
   );
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   names: state.currencies.names,
   prices: state.currencies.prices,
-  error: state.currencies.error
+  error: state.currencies.error,
 });
-const mapDispatchToProps = dispatch => ({
-  getNames: symbols => dispatch(getNames(symbols)),
-  getPrices: priceSymbols => dispatch(getPrices(priceSymbols)),
-  clearLastConversion: () => dispatch(clearLastConversion())
+const mapDispatchToProps = (dispatch) => ({
+  getNames: (symbols) => dispatch(getNames(symbols)),
+  getPrices: (priceSymbols) => dispatch(getPrices(priceSymbols)),
+  clearLastConversion: () => dispatch(clearLastConversion()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
